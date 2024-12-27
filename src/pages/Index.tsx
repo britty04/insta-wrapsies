@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { GradientButton } from "@/components/GradientButton";
 import { StatsCard } from "@/components/StatsCard";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
-import { Helmet } from "react-helmet";
 import html2canvas from "html2canvas";
 import { Instagram, Loader2 } from "lucide-react";
 import { InstagramProfile } from "@/components/InstagramProfile";
 import { SubscriptionModal } from "@/components/SubscriptionModal";
 import { verifyInstagramUsername } from "@/utils/instagram";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { LandingHero } from "@/components/LandingHero";
 
 const MAX_DAILY_CREDITS = 3;
 
@@ -34,7 +37,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [started, setStarted] = useState(false);
   const [stats, setStats] = useState<any>(null);
-  const [creditsUsed, setCreditsUsed] = useState(0);
+  const [creditsUsed, setCreditsUsed] = useState(0); // Start with 0 credits for development
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [profileData, setProfileData] = useState<{
     isPrivate?: boolean;
@@ -159,20 +162,16 @@ const Index = () => {
         <meta name="keywords" content="Instagram Wrapped, 2024 Review, Social Media Analytics, Instagram Stats" />
       </Helmet>
 
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-gray-900 to-black">
+      <div className="min-h-screen relative bg-gradient-to-br from-gray-900 to-black">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(131,58,180,0.2),transparent_40%)] pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(193,53,132,0.2),transparent_40%)] pointer-events-none" />
 
-        <div className="container mx-auto px-4 py-12 min-h-screen flex flex-col justify-center">
+        <Navbar />
+
+        <div className="container mx-auto px-4 py-24 min-h-screen flex flex-col justify-center">
           {!started ? (
-            <div className="max-w-2xl mx-auto text-center animate-fade-in space-y-8">
-              <Instagram className="w-16 h-16 mx-auto text-pink-500 animate-pulse" />
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange bg-clip-text text-transparent">
-                Your 2024 Instagram Wrapped
-              </h1>
-              <p className="text-lg md:text-xl text-white/80 mb-8">
-                Discover your Instagram journey through 2024 with beautiful insights and shareable stats.
-              </p>
+            <div className="max-w-2xl mx-auto text-center">
+              <LandingHero />
               <div className="space-y-4">
                 <div className="relative max-w-md mx-auto">
                   <Input
@@ -180,10 +179,10 @@ const Index = () => {
                     placeholder="Enter your Instagram username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="text-center pl-10"
+                    className="text-center pl-10 bg-white/5 border-white/10 text-white"
                     disabled={isVerifying || isLoading}
                   />
-                  <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
                 </div>
                 <div className="text-sm text-white/60 mb-4">
                   Credits remaining: {MAX_DAILY_CREDITS - creditsUsed} of {MAX_DAILY_CREDITS}
@@ -250,6 +249,8 @@ const Index = () => {
             </div>
           )}
         </div>
+
+        <Footer />
       </div>
 
       <SubscriptionModal 
