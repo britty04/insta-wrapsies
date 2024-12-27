@@ -9,7 +9,7 @@ import html2canvas from "html2canvas";
 
 const generateRandomStats = (username: string) => {
   // Seed the random generator with username for consistent results per user
-  const seed = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  let seed = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const random = () => {
     seed = (seed * 9301 + 49297) % 233280;
     return seed / 233280;
