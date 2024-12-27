@@ -5,7 +5,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Helmet } from "react-helmet";
 import html2canvas from "html2canvas";
-import { Instagram, Loader2, Share2, Download, Lock } from "lucide-react";
+import { Instagram, Loader2 } from "lucide-react";
+import { InstagramProfile } from "@/components/InstagramProfile";
+import { SubscriptionModal } from "@/components/SubscriptionModal";
+import { verifyInstagramUsername } from "@/utils/instagram";
 
 const MAX_DAILY_CREDITS = 3;
 
@@ -24,12 +27,6 @@ const generateRandomStats = (username: string) => {
   };
 };
 
-const verifyInstagramUsername = async (username: string): Promise<boolean> => {
-  // Simulate API call with basic validation
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return /^[a-zA-Z0-9._]{1,30}$/.test(username) && !username.includes('..');
-};
-
 const Index = () => {
   const { toast } = useToast();
   const [username, setUsername] = useState("");
@@ -38,6 +35,11 @@ const Index = () => {
   const [started, setStarted] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [creditsUsed, setCreditsUsed] = useState(0);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [profileData, setProfileData] = useState<{
+    isPrivate?: boolean;
+    profilePicUrl?: string;
+  }>({});
 
   useEffect(() => {
     const savedCredits = localStorage.getItem('creditsUsed');
@@ -64,17 +66,13 @@ const Index = () => {
     }
 
     if (creditsUsed >= MAX_DAILY_CREDITS) {
-      toast({
-        title: "Daily Credits Exhausted",
-        description: "Purchase premium access for unlimited insights!",
-        variant: "destructive",
-      });
+      setShowSubscriptionModal(true);
       return;
     }
 
     setIsVerifying(true);
     try {
-      const isValid = await verifyInstagramUsername(username);
+      const { isValid, isPrivate, profilePicUrl } = await verifyInstagramUsername(username);
       if (!isValid) {
         toast({
           title: "Invalid Username",
@@ -85,6 +83,18 @@ const Index = () => {
         return;
       }
 
+      if (isPrivate) {
+        toast({
+          title: "Private Account",
+          description: "Please make your account public to view insights.",
+          variant: "destructive",
+        });
+        setProfileData({ isPrivate, profilePicUrl });
+        setIsVerifying(false);
+        return;
+      }
+
+      setProfileData({ isPrivate: false, profilePicUrl });
       setIsLoading(true);
       // Simulate loading time for better UX
       await new Promise(resolve => setTimeout(resolve, 5000));
@@ -109,12 +119,15 @@ const Index = () => {
 
   const handleShare = async () => {
     const statsElement = document.getElementById('stats-container');
-    if (statsElement) {
+    const downloadButton = document.querySelector('[data-download-button]');
+    if (statsElement && downloadButton) {
       try {
+        downloadButton.classList.add('hidden');
         const canvas = await html2canvas(statsElement, {
           backgroundColor: '#000000',
           scale: 2,
         });
+        downloadButton.classList.remove('hidden');
         const image = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = image;
@@ -198,49 +211,51 @@ const Index = () => {
             </div>
           ) : (
             <div className="max-w-4xl mx-auto" id="stats-container">
-              <div className="bg-black/40 backdrop-blur-lg rounded-3xl p-8 border border-white/10 shadow-2xl">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">@{username}'s 2024 Wrapped</h2>
-                  <p className="text-white/60">Your year on Instagram</p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  <StatsCard
-                    title="Active Days"
-                    value={stats.activeDays}
-                    description="You were active on Instagram for this many days in 2024"
-                  />
-                  <StatsCard
-                    title="Posts Liked"
-                    value={stats.postsLiked.toLocaleString()}
-                    description="You spread love through likes"
-                  />
-                  <StatsCard
-                    title="Stories Watched"
-                    value={stats.storiesWatched.toLocaleString()}
-                    description="You kept up with your friends' daily moments"
-                  />
-                  <StatsCard
-                    title="Peak Activity"
-                    value={stats.peakHour}
-                    description="Your most active hour on Instagram"
-                  />
-                </div>
-                
-                <div className="text-center mt-12 space-x-4">
-                  <GradientButton 
-                    onClick={handleShare}
-                    className="text-lg px-8 py-4"
-                  >
-                    <Download className="mr-2 h-5 w-5" />
-                    Download Card
-                  </GradientButton>
-                </div>
+              <InstagramProfile 
+                username={username}
+                isPrivate={profileData.isPrivate}
+                profilePicUrl={profileData.profilePicUrl}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <StatsCard
+                  title="Active Days"
+                  value={stats.activeDays}
+                  description="You were active on Instagram for this many days in 2024"
+                />
+                <StatsCard
+                  title="Posts Liked"
+                  value={stats.postsLiked.toLocaleString()}
+                  description="You spread love through likes"
+                />
+                <StatsCard
+                  title="Stories Watched"
+                  value={stats.storiesWatched.toLocaleString()}
+                  description="You kept up with your friends' daily moments"
+                />
+                <StatsCard
+                  title="Peak Activity"
+                  value={stats.peakHour}
+                  description="Your most active hour on Instagram"
+                />
+              </div>
+              
+              <div className="text-center mt-12" data-download-button>
+                <GradientButton 
+                  onClick={handleShare}
+                  className="text-lg px-8 py-4"
+                >
+                  Download Card
+                </GradientButton>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      <SubscriptionModal 
+        isOpen={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+      />
     </>
   );
 };
