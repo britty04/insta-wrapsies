@@ -8,12 +8,13 @@ import html2canvas from "html2canvas";
 import { Instagram, Loader2 } from "lucide-react";
 import { InstagramProfile } from "@/components/InstagramProfile";
 import { SubscriptionModal } from "@/components/SubscriptionModal";
-import { verifyInstagramUsername } from "@/utils/instagram";
+import { LandingContent } from "@/components/LandingContent";
+import { fetchInstagramProfile } from "@/utils/instagramApi";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LandingHero } from "@/components/LandingHero";
 
-const MAX_DAILY_CREDITS = 3;
+const MAX_DAILY_CREDITS = 0; // Set to 0 for development
 
 const generateRandomStats = (username: string) => {
   let seed = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -37,11 +38,14 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [started, setStarted] = useState(false);
   const [stats, setStats] = useState<any>(null);
-  const [creditsUsed, setCreditsUsed] = useState(0); // Start with 0 credits for development
+  const [creditsUsed, setCreditsUsed] = useState(0);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [profileData, setProfileData] = useState<{
     isPrivate?: boolean;
     profilePicUrl?: string;
+    followers?: number;
+    following?: number;
+    posts?: number;
   }>({});
 
   useEffect(() => {
@@ -75,8 +79,9 @@ const Index = () => {
 
     setIsVerifying(true);
     try {
-      const { isValid, isPrivate, profilePicUrl } = await verifyInstagramUsername(username);
-      if (!isValid) {
+      const profile = await fetchInstagramProfile(username);
+      
+      if (!profile) {
         toast({
           title: "Invalid Username",
           description: "Please check your Instagram username and try again.",
@@ -86,19 +91,20 @@ const Index = () => {
         return;
       }
 
-      if (isPrivate) {
+      if (profile.isPrivate) {
         toast({
           title: "Private Account",
           description: "Please make your account public to view insights.",
           variant: "destructive",
         });
-        setProfileData({ isPrivate, profilePicUrl });
+        setProfileData(profile);
         setIsVerifying(false);
         return;
       }
 
-      setProfileData({ isPrivate: false, profilePicUrl });
+      setProfileData(profile);
       setIsLoading(true);
+      
       // Simulate loading time for better UX
       await new Promise(resolve => setTimeout(resolve, 5000));
       
@@ -152,112 +158,102 @@ const Index = () => {
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Instagram Wrapped 2024 - Your Year in Review</title>
-        <meta name="description" content="Discover your Instagram journey through 2024 with beautiful insights and shareable stats. See your active days, liked posts, and more!" />
-        <meta property="og:title" content="Instagram Wrapped 2024" />
-        <meta property="og:description" content="Get your personalized Instagram year in review for 2024" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="keywords" content="Instagram Wrapped, 2024 Review, Social Media Analytics, Instagram Stats" />
-      </Helmet>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(131,58,180,0.2),transparent_40%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(193,53,132,0.2),transparent_40%)] pointer-events-none" />
 
-      <div className="min-h-screen relative bg-gradient-to-br from-gray-900 to-black">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(131,58,180,0.2),transparent_40%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(193,53,132,0.2),transparent_40%)] pointer-events-none" />
+      <Navbar />
 
-        <Navbar />
-
-        <div className="container mx-auto px-4 py-24 min-h-screen flex flex-col justify-center">
-          {!started ? (
-            <div className="max-w-2xl mx-auto text-center">
-              <LandingHero />
-              <div className="space-y-4">
-                <div className="relative max-w-md mx-auto">
-                  <Input
-                    type="text"
-                    placeholder="Enter your Instagram username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="text-center pl-10 bg-white/5 border-white/10 text-white"
-                    disabled={isVerifying || isLoading}
-                  />
-                  <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
-                </div>
-                <div className="text-sm text-white/60 mb-4">
-                  Credits remaining: {MAX_DAILY_CREDITS - creditsUsed} of {MAX_DAILY_CREDITS}
-                </div>
-                <GradientButton 
-                  onClick={handleStart} 
-                  className="text-lg px-8 py-6 w-full max-w-md mx-auto"
+      <main className="container mx-auto px-4 py-12 relative z-10">
+        {!started ? (
+          <div className="max-w-4xl mx-auto">
+            <LandingHero />
+            <LandingContent />
+            <div className="mt-12 space-y-4">
+              <div className="relative max-w-md mx-auto">
+                <Input
+                  type="text"
+                  placeholder="Enter your Instagram username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="text-center pl-10 bg-white/5 border-white/10 text-white"
                   disabled={isVerifying || isLoading}
-                >
-                  {isVerifying ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Verifying Username
-                    </>
-                  ) : isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Generating Insights
-                    </>
-                  ) : (
-                    <>Start Your Journey</>
-                  )}
-                </GradientButton>
+                />
+                <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
               </div>
+              <div className="text-sm text-white/60 mb-4">
+                Credits remaining: {MAX_DAILY_CREDITS - creditsUsed} of {MAX_DAILY_CREDITS}
+              </div>
+              <GradientButton 
+                onClick={handleStart} 
+                className="text-lg px-8 py-6 w-full max-w-md mx-auto"
+                disabled={isVerifying || isLoading}
+              >
+                {isVerifying ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Verifying Username
+                  </>
+                ) : isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Generating Insights
+                  </>
+                ) : (
+                  <>Start Your Journey</>
+                )}
+              </GradientButton>
             </div>
-          ) : (
-            <div className="max-w-4xl mx-auto" id="stats-container">
-              <InstagramProfile 
-                username={username}
-                isPrivate={profileData.isPrivate}
-                profilePicUrl={profileData.profilePicUrl}
+          </div>
+        ) : (
+          <div className="max-w-4xl mx-auto" id="stats-container">
+            <InstagramProfile 
+              username={username}
+              isPrivate={profileData.isPrivate}
+              profilePicUrl={profileData.profilePicUrl}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <StatsCard
+                title="Active Days"
+                value={stats.activeDays}
+                description="You were active on Instagram for this many days in 2024"
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <StatsCard
-                  title="Active Days"
-                  value={stats.activeDays}
-                  description="You were active on Instagram for this many days in 2024"
-                />
-                <StatsCard
-                  title="Posts Liked"
-                  value={stats.postsLiked.toLocaleString()}
-                  description="You spread love through likes"
-                />
-                <StatsCard
-                  title="Stories Watched"
-                  value={stats.storiesWatched.toLocaleString()}
-                  description="You kept up with your friends' daily moments"
-                />
-                <StatsCard
-                  title="Peak Activity"
-                  value={stats.peakHour}
-                  description="Your most active hour on Instagram"
-                />
-              </div>
-              
-              <div className="text-center mt-12" data-download-button>
-                <GradientButton 
-                  onClick={handleShare}
-                  className="text-lg px-8 py-4"
-                >
-                  Download Card
-                </GradientButton>
-              </div>
+              <StatsCard
+                title="Posts Liked"
+                value={stats.postsLiked.toLocaleString()}
+                description="You spread love through likes"
+              />
+              <StatsCard
+                title="Stories Watched"
+                value={stats.storiesWatched.toLocaleString()}
+                description="You kept up with your friends' daily moments"
+              />
+              <StatsCard
+                title="Peak Activity"
+                value={stats.peakHour}
+                description="Your most active hour on Instagram"
+              />
             </div>
-          )}
-        </div>
+            
+            <div className="text-center mt-12" data-download-button>
+              <GradientButton 
+                onClick={handleShare}
+                className="text-lg px-8 py-4"
+              >
+                Download Card
+              </GradientButton>
+            </div>
+          </div>
+        )}
+      </main>
 
-        <Footer />
-      </div>
+      <Footer />
 
       <SubscriptionModal 
         isOpen={showSubscriptionModal}
         onClose={() => setShowSubscriptionModal(false)}
       />
-    </>
+    </div>
   );
 };
 

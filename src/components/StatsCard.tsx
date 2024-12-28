@@ -15,7 +15,7 @@ export const StatsCard = ({ title, value, description, className }: StatsCardPro
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className={cn(
-        "backdrop-blur-md bg-black/40 rounded-2xl p-6 shadow-xl",
+        "backdrop-blur-md bg-black/40 rounded-2xl p-6",
         "transform transition-all hover:scale-105",
         "relative overflow-hidden",
         className
@@ -24,7 +24,7 @@ export const StatsCard = ({ title, value, description, className }: StatsCardPro
       <div className="absolute inset-0 bg-gradient-to-br from-instagram-purple/20 via-instagram-pink/20 to-instagram-orange/20" />
       <div className="relative z-10">
         <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
-        <p className="text-4xl font-bold mb-2 bg-gradient-to-r from-instagram-purple to-instagram-orange bg-clip-text text-transparent">
+        <p className="text-4xl font-bold mb-2 text-white">
           {value}
         </p>
         {description && (
