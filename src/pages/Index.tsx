@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { LandingContent } from "@/components/LandingContent";
 import { SearchSection } from "@/components/SearchSection";
 import { StatsSection } from "@/components/StatsSection";
-import { Drawer } from "@/components/ui/drawer";
 import html2canvas from 'html2canvas';
 
 const MAX_DAILY_CREDITS = 20;
@@ -14,23 +13,16 @@ const PREDEFINED_PROFILE = {
   followers: 363,
   following: 373,
   posts: 0,
-  profilePicUrl: "/brittytino.jpg"
+  profilePicUrl: "/brittytino.jpg",
+  isPrivate: false
 };
 
-const generateRandomStats = (username: string) => ({
-  activeDays: Math.floor(Math.random() * (365 - 200) + 200),
-  postsLiked: Math.floor(Math.random() * (5000 - 500) + 500),
-  storiesWatched: Math.floor(Math.random() * (10000 - 1000) + 1000),
-  peakHour: `${Math.floor(Math.random() * (23 - 6) + 6)}:00`,
+const generateRealisticStats = () => ({
+  weeklyActivity: "4 days",
+  engagementRate: "2.8%",
+  bestTimeToPost: "6:00 PM",
+  topContentType: "Reels"
 });
-
-const simulateProfileFetch = async () => {
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return {
-    isPrivate: false,
-    ...PREDEFINED_PROFILE
-  };
-};
 
 const Index = () => {
   const { toast } = useToast();
@@ -42,39 +34,6 @@ const Index = () => {
   const [creditsUsed, setCreditsUsed] = useState(0);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [profileData, setProfileData] = useState(PREDEFINED_PROFILE);
-  const [memeUrl, setMemeUrl] = useState("");
-
-  useEffect(() => {
-    const savedCredits = localStorage.getItem('creditsUsed');
-    const lastUsedDate = localStorage.getItem('lastUsedDate');
-    const today = new Date().toDateString();
-
-    if (lastUsedDate !== today) {
-      localStorage.setItem('creditsUsed', '0');
-      localStorage.setItem('lastUsedDate', today);
-      setCreditsUsed(0);
-    } else if (savedCredits) {
-      setCreditsUsed(parseInt(savedCredits));
-    }
-  }, []);
-
-  const fetchMeme = async () => {
-    try {
-      const response = await fetch(
-        'https://ronreiter-meme-generator.p.rapidapi.com/meme?font_size=50&top=Top%20Text&font=Impact&bottom=Bottom%20Text&meme=Condescending-Wonka',
-        {
-          headers: {
-            'x-rapidapi-key': 'YOUR_API_KEY',
-            'x-rapidapi-host': 'ronreiter-meme-generator.p.rapidapi.com'
-          }
-        }
-      );
-      const blob = await response.blob();
-      setMemeUrl(URL.createObjectURL(blob));
-    } catch (error) {
-      console.error('Error fetching meme:', error);
-    }
-  };
 
   const handleStart = async () => {
     if (!username) {
@@ -93,33 +52,21 @@ const Index = () => {
 
     setIsVerifying(true);
     try {
-      const profile = await simulateProfileFetch();
-      
-      if (profile.isPrivate) {
-        toast({
-          title: "Private Account",
-          description: "Please make your account public to view insights.",
-          variant: "destructive",
-        });
-        setProfileData(profile);
-        setIsVerifying(false);
-        return;
-      }
-
-      setProfileData(profile);
+      // Simulate profile fetch with predefined data
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setProfileData(PREDEFINED_PROFILE);
       setIsLoading(true);
       
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      setStats(generateRandomStats(username));
+      setStats(generateRealisticStats());
       setStarted(true);
+      
       const newCreditsUsed = creditsUsed + 1;
       setCreditsUsed(newCreditsUsed);
       localStorage.setItem('creditsUsed', newCreditsUsed.toString());
       localStorage.setItem('lastUsedDate', new Date().toDateString());
       
-      // Fetch meme after analytics are shown
-      await fetchMeme();
     } catch (error) {
       toast({
         title: "Error",
@@ -151,7 +98,7 @@ const Index = () => {
         
         toast({
           title: "Success!",
-          description: "Your wrapped card has been downloaded. Share it on your favorite social media!",
+          description: "Your insights card has been downloaded. Share it with your friends!",
         });
       } catch (error) {
         toast({
@@ -183,7 +130,9 @@ const Index = () => {
               isVerifying={isVerifying}
               isLoading={isLoading}
             />
-            <LandingContent />
+            <div className="mt-16">
+              <LandingContent />
+            </div>
           </motion.div>
         ) : (
           <div id="stats-container">
@@ -193,16 +142,6 @@ const Index = () => {
               profileData={profileData}
               handleShare={handleShare}
             />
-            {memeUrl && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mt-8 max-w-md mx-auto"
-              >
-                <img src={memeUrl} alt="Meme" className="rounded-lg shadow-xl" />
-              </motion.div>
-            )}
           </div>
         )}
       </main>

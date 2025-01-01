@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { GradientButton } from "@/components/GradientButton";
 import { Instagram, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
 
 interface SearchSectionProps {
   username: string;
@@ -20,36 +21,40 @@ export const SearchSection = ({ username, setUsername, handleStart, isVerifying,
       transition={{ duration: 0.5 }}
       className="max-w-md mx-auto space-y-6"
     >
-      <div className="relative">
-        <Input
-          type="text"
-          placeholder="Enter your Instagram username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="text-center pl-10 bg-white/5 border-white/10 text-white"
-          disabled={isVerifying || isLoading}
-        />
-        <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
-      </div>
-      <GradientButton 
-        onClick={handleStart} 
-        className="text-lg px-8 py-6 w-full"
-        disabled={isVerifying || isLoading}
-      >
-        {isVerifying ? (
-          <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Verifying Username
-          </>
-        ) : isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Generating Insights
-          </>
-        ) : (
-          <>Start Your Journey</>
-        )}
-      </GradientButton>
+      <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
+        <div className="space-y-4">
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Enter your Instagram username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="text-center pl-10 bg-white/5 border-white/10 text-white"
+              disabled={isVerifying || isLoading}
+            />
+            <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
+          </div>
+          <GradientButton 
+            onClick={handleStart} 
+            className="text-lg px-8 py-6 w-full"
+            disabled={isVerifying || isLoading}
+          >
+            {isVerifying ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Verifying Username
+              </>
+            ) : isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Generating Insights
+              </>
+            ) : (
+              <>Start Your Journey</>
+            )}
+          </GradientButton>
+        </div>
+      </Card>
     </motion.div>
   );
 };

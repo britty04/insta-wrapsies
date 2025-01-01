@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Instagram, Users, Camera, Heart, MessageCircle, Share2, Sparkles, TrendingUp, Lock, Laugh } from "lucide-react";
+import { Users, Camera, Heart, MessageCircle, Share2, Sparkles, TrendingUp, Lock, Laugh } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const LandingContent = () => {

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { StatsCard } from "@/components/StatsCard";
 import { InstagramProfile } from "@/components/InstagramProfile";
 import { GradientButton } from "@/components/GradientButton";
+import { Card } from "@/components/ui/card";
 
 interface StatsSectionProps {
   username: string;
@@ -22,27 +23,31 @@ export const StatsSection = ({ username, stats, profileData, handleShare }: Stat
         username={username}
         isPrivate={profileData.isPrivate}
         profilePicUrl={profileData.profilePicUrl}
+        followers={profileData.followers}
+        following={profileData.following}
+        posts={profileData.posts}
       />
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <StatsCard
-          title="Active Days"
-          value={stats.activeDays}
-          description="You were active on Instagram for this many days in 2024"
+          title="Weekly Activity"
+          value="4 days"
+          description="Your average active days per week"
         />
         <StatsCard
-          title="Posts Liked"
-          value={stats.postsLiked.toLocaleString()}
-          description="You spread love through likes"
+          title="Engagement Rate"
+          value="2.8%"
+          description="Your average engagement per post"
         />
         <StatsCard
-          title="Stories Watched"
-          value={stats.storiesWatched.toLocaleString()}
-          description="You kept up with your friends' daily moments"
+          title="Best Time to Post"
+          value="6:00 PM"
+          description="When your audience is most active"
         />
         <StatsCard
-          title="Peak Activity"
-          value={stats.peakHour}
-          description="Your most active hour on Instagram"
+          title="Top Content Type"
+          value="Reels"
+          description="Your most engaging content format"
         />
       </div>
       
@@ -51,9 +56,24 @@ export const StatsSection = ({ username, stats, profileData, handleShare }: Stat
           onClick={handleShare}
           className="text-lg px-8 py-4"
         >
-          Download Card
+          Download Insights
         </GradientButton>
       </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="mt-12"
+      >
+        <Card className="overflow-hidden bg-black/40 backdrop-blur-sm border-white/10">
+          <img 
+            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjM0YjBjMzQyMTQ5ZWM5ZTJiZDM4ZDM4ZWJjNzU0ZmQ5ZTI5ZjE3YiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/3oEjHAUOqG3lSS0f1C/giphy.gif" 
+            alt="Celebration Meme"
+            className="w-full h-auto rounded-lg"
+          />
+        </Card>
+      </motion.div>
     </motion.div>
   );
 };
