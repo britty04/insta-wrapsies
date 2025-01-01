@@ -6,6 +6,7 @@ import { LandingHero } from "@/components/LandingHero";
 import { SearchSection } from "@/components/SearchSection";
 import { StatsSection } from "@/components/StatsSection";
 import { Drawer } from "@/components/ui/drawer";
+import html2canvas from 'html2canvas';
 
 const MAX_DAILY_CREDITS = 20;
 
