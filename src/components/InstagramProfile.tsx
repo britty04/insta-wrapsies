@@ -38,13 +38,13 @@ export const InstagramProfile = ({ username, isPrivate, profilePicUrl }: Instagr
         ) : (
           <div className="flex space-x-4 mt-2">
             <div className="text-white/80">
-              <span className="font-bold text-white">1.2K</span> posts
+              <span className="font-bold text-white">1,012</span> posts
             </div>
             <div className="text-white/80">
-              <span className="font-bold text-white">4.5K</span> followers
+              <span className="font-bold text-white">1.1M</span> followers
             </div>
             <div className="text-white/80">
-              <span className="font-bold text-white">892</span> following
+              <span className="font-bold text-white">1,258</span> following
             </div>
           </div>
         )}

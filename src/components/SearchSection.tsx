@@ -21,6 +21,13 @@ export const SearchSection = ({ username, setUsername, handleStart, isVerifying,
       className="max-w-md mx-auto space-y-4"
     >
       <div className="relative">
+        <div className="absolute -top-32 left-1/2 transform -translate-x-1/2 w-40 h-40">
+          <img 
+            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjM5YzBkZjY5ZTM4ZTBhZGNiZDM4ZjM5Y2JlZGNiOWM0ZTY4ZjZhYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/xT0GqimU9HSdMNQ2A0/giphy.gif" 
+            alt="Meme"
+            className="w-full h-full object-cover rounded-lg shadow-xl"
+          />
+        </div>
         <Input
           type="text"
           placeholder="Enter your Instagram username"
