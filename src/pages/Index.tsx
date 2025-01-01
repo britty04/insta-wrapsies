@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import html2canvas from "html2canvas";
-import { SubscriptionModal } from "@/components/SubscriptionModal";
 import { LandingContent } from "@/components/LandingContent";
 import { LandingHero } from "@/components/LandingHero";
 import { SearchSection } from "@/components/SearchSection";
 import { StatsSection } from "@/components/StatsSection";
+import { Drawer } from "@/components/ui/drawer";
 
 const MAX_DAILY_CREDITS = 20;
 
@@ -26,13 +25,11 @@ const generateRandomStats = (username: string) => {
 };
 
 const simulateProfileFetch = async (username: string) => {
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // Generate random profile data
   return {
     isPrivate: Math.random() > 0.7,
-    profilePicUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`,
+    profilePicUrl: "https://instagram.fmaa2-3.fna.fbcdn.net/v/t51.2885-19/457028319_512473401142173_6604381690495407370_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fmaa2-3.fna.fbcdn.net&_nc_cat=109&_nc_ohc=Mz3PxlDvOScQ7kNvgEmY9m6&_nc_gid=d3c12f4d61144e5f994dede9ebef4e7d&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AYDk4h1Avr7S1sKH1gqKJIHJY4ytg9L6taHeosnroH5dKw&oe=677B452D&_nc_sid=8b3546",
     followers: Math.floor(Math.random() * 5000),
     following: Math.floor(Math.random() * 1000),
     posts: Math.floor(Math.random() * 500),
@@ -155,7 +152,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(131,58,180,0.2),transparent_40%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(193,53,132,0.2),transparent_40%)] pointer-events-none" />
 
@@ -188,11 +185,6 @@ const Index = () => {
           </div>
         )}
       </main>
-
-      <SubscriptionModal 
-        isOpen={showSubscriptionModal}
-        onClose={() => setShowSubscriptionModal(false)}
-      />
     </div>
   );
 };
