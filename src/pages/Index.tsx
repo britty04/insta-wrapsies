@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { LandingContent } from "@/components/LandingContent";
-import { LandingHero } from "@/components/LandingHero";
 import { SearchSection } from "@/components/SearchSection";
 import { StatsSection } from "@/components/StatsSection";
 import { Drawer } from "@/components/ui/drawer";
@@ -10,49 +9,40 @@ import html2canvas from 'html2canvas';
 
 const MAX_DAILY_CREDITS = 20;
 
-const generateRandomStats = (username: string) => {
-  let seed = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const random = () => {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed / 233280;
-  };
-
-  return {
-    activeDays: Math.floor(random() * (365 - 200) + 200),
-    postsLiked: Math.floor(random() * (5000 - 500) + 500),
-    storiesWatched: Math.floor(random() * (10000 - 1000) + 1000),
-    peakHour: `${Math.floor(random() * (23 - 6) + 6)}:00`,
-  };
+const PREDEFINED_PROFILE = {
+  username: "brittytino",
+  followers: 363,
+  following: 373,
+  posts: 0,
+  profilePicUrl: "/brittytino.jpg"
 };
 
-const simulateProfileFetch = async (username: string) => {
+const generateRandomStats = (username: string) => ({
+  activeDays: Math.floor(Math.random() * (365 - 200) + 200),
+  postsLiked: Math.floor(Math.random() * (5000 - 500) + 500),
+  storiesWatched: Math.floor(Math.random() * (10000 - 1000) + 1000),
+  peakHour: `${Math.floor(Math.random() * (23 - 6) + 6)}:00`,
+});
+
+const simulateProfileFetch = async () => {
   await new Promise(resolve => setTimeout(resolve, 1500));
-  
   return {
-    isPrivate: Math.random() > 0.7,
-    profilePicUrl: "https://instagram.fmaa2-3.fna.fbcdn.net/v/t51.2885-19/457028319_512473401142173_6604381690495407370_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fmaa2-3.fna.fbcdn.net&_nc_cat=109&_nc_ohc=Mz3PxlDvOScQ7kNvgEmY9m6&_nc_gid=d3c12f4d61144e5f994dede9ebef4e7d&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AYDk4h1Avr7S1sKH1gqKJIHJY4ytg9L6taHeosnroH5dKw&oe=677B452D&_nc_sid=8b3546",
-    followers: Math.floor(Math.random() * 5000),
-    following: Math.floor(Math.random() * 1000),
-    posts: Math.floor(Math.random() * 500),
+    isPrivate: false,
+    ...PREDEFINED_PROFILE
   };
 };
 
 const Index = () => {
   const { toast } = useToast();
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(PREDEFINED_PROFILE.username);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [started, setStarted] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [creditsUsed, setCreditsUsed] = useState(0);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const [profileData, setProfileData] = useState<{
-    isPrivate?: boolean;
-    profilePicUrl?: string;
-    followers?: number;
-    following?: number;
-    posts?: number;
-  }>({});
+  const [profileData, setProfileData] = useState(PREDEFINED_PROFILE);
+  const [memeUrl, setMemeUrl] = useState("");
 
   useEffect(() => {
     const savedCredits = localStorage.getItem('creditsUsed');
@@ -67,6 +57,24 @@ const Index = () => {
       setCreditsUsed(parseInt(savedCredits));
     }
   }, []);
+
+  const fetchMeme = async () => {
+    try {
+      const response = await fetch(
+        'https://ronreiter-meme-generator.p.rapidapi.com/meme?font_size=50&top=Top%20Text&font=Impact&bottom=Bottom%20Text&meme=Condescending-Wonka',
+        {
+          headers: {
+            'x-rapidapi-key': 'YOUR_API_KEY',
+            'x-rapidapi-host': 'ronreiter-meme-generator.p.rapidapi.com'
+          }
+        }
+      );
+      const blob = await response.blob();
+      setMemeUrl(URL.createObjectURL(blob));
+    } catch (error) {
+      console.error('Error fetching meme:', error);
+    }
+  };
 
   const handleStart = async () => {
     if (!username) {
@@ -85,7 +93,7 @@ const Index = () => {
 
     setIsVerifying(true);
     try {
-      const profile = await simulateProfileFetch(username);
+      const profile = await simulateProfileFetch();
       
       if (profile.isPrivate) {
         toast({
@@ -109,6 +117,9 @@ const Index = () => {
       setCreditsUsed(newCreditsUsed);
       localStorage.setItem('creditsUsed', newCreditsUsed.toString());
       localStorage.setItem('lastUsedDate', new Date().toDateString());
+      
+      // Fetch meme after analytics are shown
+      await fetchMeme();
     } catch (error) {
       toast({
         title: "Error",
@@ -160,12 +171,11 @@ const Index = () => {
       <main className="container mx-auto px-4 py-12 relative z-10">
         {!started ? (
           <motion.div 
-            className="max-w-4xl mx-auto"
+            className="max-w-4xl mx-auto mt-20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <LandingHero />
             <SearchSection 
               username={username}
               setUsername={setUsername}
@@ -183,6 +193,16 @@ const Index = () => {
               profileData={profileData}
               handleShare={handleShare}
             />
+            {memeUrl && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mt-8 max-w-md mx-auto"
+              >
+                <img src={memeUrl} alt="Meme" className="rounded-lg shadow-xl" />
+              </motion.div>
+            )}
           </div>
         )}
       </main>
