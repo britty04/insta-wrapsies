@@ -1,20 +1,14 @@
 import { useState, useEffect } from "react";
-import { Helmet } from "react-helmet";
-import { GradientButton } from "@/components/GradientButton";
-import { StatsCard } from "@/components/StatsCard";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
 import html2canvas from "html2canvas";
-import { Instagram, Loader2 } from "lucide-react";
-import { InstagramProfile } from "@/components/InstagramProfile";
 import { SubscriptionModal } from "@/components/SubscriptionModal";
 import { LandingContent } from "@/components/LandingContent";
-import { fetchInstagramProfile } from "@/utils/instagramApi";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { LandingHero } from "@/components/LandingHero";
+import { SearchSection } from "@/components/SearchSection";
+import { StatsSection } from "@/components/StatsSection";
 
-const MAX_DAILY_CREDITS = 0; // Set to 0 for development
+const MAX_DAILY_CREDITS = 20;
 
 const generateRandomStats = (username: string) => {
   let seed = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -28,6 +22,20 @@ const generateRandomStats = (username: string) => {
     postsLiked: Math.floor(random() * (5000 - 500) + 500),
     storiesWatched: Math.floor(random() * (10000 - 1000) + 1000),
     peakHour: `${Math.floor(random() * (23 - 6) + 6)}:00`,
+  };
+};
+
+const simulateProfileFetch = async (username: string) => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Generate random profile data
+  return {
+    isPrivate: Math.random() > 0.7,
+    profilePicUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`,
+    followers: Math.floor(Math.random() * 5000),
+    following: Math.floor(Math.random() * 1000),
+    posts: Math.floor(Math.random() * 500),
   };
 };
 
@@ -79,18 +87,8 @@ const Index = () => {
 
     setIsVerifying(true);
     try {
-      const profile = await fetchInstagramProfile(username);
+      const profile = await simulateProfileFetch(username);
       
-      if (!profile) {
-        toast({
-          title: "Invalid Username",
-          description: "Please check your Instagram username and try again.",
-          variant: "destructive",
-        });
-        setIsVerifying(false);
-        return;
-      }
-
       if (profile.isPrivate) {
         toast({
           title: "Private Account",
@@ -105,8 +103,7 @@ const Index = () => {
       setProfileData(profile);
       setIsLoading(true);
       
-      // Simulate loading time for better UX
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       setStats(generateRandomStats(username));
       setStarted(true);
@@ -158,96 +155,39 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(131,58,180,0.2),transparent_40%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(193,53,132,0.2),transparent_40%)] pointer-events-none" />
 
-      <Navbar />
-
       <main className="container mx-auto px-4 py-12 relative z-10">
         {!started ? (
-          <div className="max-w-4xl mx-auto">
+          <motion.div 
+            className="max-w-4xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <LandingHero />
-            <LandingContent />
-            <div className="mt-12 space-y-4">
-              <div className="relative max-w-md mx-auto">
-                <Input
-                  type="text"
-                  placeholder="Enter your Instagram username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="text-center pl-10 bg-white/5 border-white/10 text-white"
-                  disabled={isVerifying || isLoading}
-                />
-                <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
-              </div>
-              <div className="text-sm text-white/60 mb-4">
-                Credits remaining: {MAX_DAILY_CREDITS - creditsUsed} of {MAX_DAILY_CREDITS}
-              </div>
-              <GradientButton 
-                onClick={handleStart} 
-                className="text-lg px-8 py-6 w-full max-w-md mx-auto"
-                disabled={isVerifying || isLoading}
-              >
-                {isVerifying ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Verifying Username
-                  </>
-                ) : isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Generating Insights
-                  </>
-                ) : (
-                  <>Start Your Journey</>
-                )}
-              </GradientButton>
-            </div>
-          </div>
-        ) : (
-          <div className="max-w-4xl mx-auto" id="stats-container">
-            <InstagramProfile 
+            <SearchSection 
               username={username}
-              isPrivate={profileData.isPrivate}
-              profilePicUrl={profileData.profilePicUrl}
+              setUsername={setUsername}
+              handleStart={handleStart}
+              isVerifying={isVerifying}
+              isLoading={isLoading}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <StatsCard
-                title="Active Days"
-                value={stats.activeDays}
-                description="You were active on Instagram for this many days in 2024"
-              />
-              <StatsCard
-                title="Posts Liked"
-                value={stats.postsLiked.toLocaleString()}
-                description="You spread love through likes"
-              />
-              <StatsCard
-                title="Stories Watched"
-                value={stats.storiesWatched.toLocaleString()}
-                description="You kept up with your friends' daily moments"
-              />
-              <StatsCard
-                title="Peak Activity"
-                value={stats.peakHour}
-                description="Your most active hour on Instagram"
-              />
-            </div>
-            
-            <div className="text-center mt-12" data-download-button>
-              <GradientButton 
-                onClick={handleShare}
-                className="text-lg px-8 py-4"
-              >
-                Download Card
-              </GradientButton>
-            </div>
+            <LandingContent />
+          </motion.div>
+        ) : (
+          <div id="stats-container">
+            <StatsSection 
+              username={username}
+              stats={stats}
+              profileData={profileData}
+              handleShare={handleShare}
+            />
           </div>
         )}
       </main>
-
-      <Footer />
 
       <SubscriptionModal 
         isOpen={showSubscriptionModal}
