@@ -1,4 +1,4 @@
-import { ArrowLeft, Instagram, PartyPopper } from "lucide-react";
+import { ArrowLeft, Instagram, Github, PartyPopper } from "lucide-react";
 import { Button } from "./ui/button";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -29,22 +29,32 @@ export const Navbar = () => {
               </Button>
             )}
             <div className="flex items-center space-x-2">
-              <a 
-                href="https://www.instagram.com/brittytino/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Instagram className="w-6 h-6 text-pink-500 animate-pulse" />
-              </a>
               <span className="text-xl font-bold bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange bg-clip-text text-transparent">
                 Insta Wrapped
               </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <PartyPopper className="w-5 h-5 text-yellow-500 animate-bounce" />
-            <span className="text-white/80">2024</span>
+          <div className="flex items-center space-x-4">
+            <a 
+              href="https://www.instagram.com/brittytino/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-pink-500 hover:text-pink-400 transition-colors"
+            >
+              <Instagram className="w-6 h-6" />
+            </a>
+            <a 
+              href="https://github.com/brittytino" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white/80 hover:text-white transition-colors"
+            >
+              <Github className="w-6 h-6" />
+            </a>
+            <div className="flex items-center space-x-2">
+              <PartyPopper className="w-5 h-5 text-yellow-500 animate-bounce" />
+              <span className="text-white/80 hidden sm:inline">2024</span>
+            </div>
           </div>
         </div>
       </div>
