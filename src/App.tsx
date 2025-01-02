@@ -4,17 +4,24 @@ import { Toaster } from "@/components/ui/toaster";
 import Index from "./pages/Index";
 import "./App.css";
 
-// Create a client
-const queryClient = new QueryClient();
-
 function App() {
+  // Create a client
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
+    <Router>
+      <QueryClientProvider client={queryClient}>
         <Index />
         <Toaster />
-      </Router>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </Router>
   );
 }
 
