@@ -3,6 +3,9 @@ import { StatsCard } from "@/components/StatsCard";
 import { InstagramProfile } from "@/components/InstagramProfile";
 import { GradientButton } from "@/components/GradientButton";
 import { Card } from "@/components/ui/card";
+import { useState } from "react";
+import { AnalyticsToggle } from "./AnalyticsToggle";
+import { AnalyticsView } from "./AnalyticsView";
 
 interface StatsSectionProps {
   username: string;
@@ -12,6 +15,8 @@ interface StatsSectionProps {
 }
 
 export const StatsSection = ({ username, stats, profileData, handleShare }: StatsSectionProps) => {
+  const [activeView, setActiveView] = useState<"insights" | "analytics">("insights");
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -28,28 +33,34 @@ export const StatsSection = ({ username, stats, profileData, handleShare }: Stat
         posts={profileData.posts}
       />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <StatsCard
-          title="Weekly Activity"
-          value="4 days"
-          description="Your average active days per week"
-        />
-        <StatsCard
-          title="Engagement Rate"
-          value="2.8%"
-          description="Your average engagement per post"
-        />
-        <StatsCard
-          title="Best Time to Post"
-          value="6:00 PM"
-          description="When your audience is most active"
-        />
-        <StatsCard
-          title="Top Content Type"
-          value="Reels"
-          description="Your most engaging content format"
-        />
-      </div>
+      <AnalyticsToggle activeView={activeView} setActiveView={setActiveView} />
+      
+      {activeView === "insights" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <StatsCard
+            title="Weekly Activity"
+            value="4 days"
+            description="Your average active days per week"
+          />
+          <StatsCard
+            title="Engagement Rate"
+            value="2.8%"
+            description="Your average engagement per post"
+          />
+          <StatsCard
+            title="Best Time to Post"
+            value="6:00 PM"
+            description="When your audience is most active"
+          />
+          <StatsCard
+            title="Top Content Type"
+            value="Reels"
+            description="Your most engaging content format"
+          />
+        </div>
+      ) : (
+        <AnalyticsView />
+      )}
       
       <div className="text-center" data-download-button>
         <GradientButton 
@@ -69,7 +80,7 @@ export const StatsSection = ({ username, stats, profileData, handleShare }: Stat
         <Card className="overflow-hidden bg-black/40 backdrop-blur-sm border-white/10">
           <img 
             src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjM0YjBjMzQyMTQ5ZWM5ZTJiZDM4ZDM4ZWJjNzU0ZmQ5ZTI5ZjE3YiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/3oEjHAUOqG3lSS0f1C/giphy.gif" 
-            alt="Celebration Meme"
+            alt="Celebration GIF"
             className="w-full h-auto rounded-lg"
           />
         </Card>
