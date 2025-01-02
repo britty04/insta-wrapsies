@@ -1,4 +1,4 @@
-import { Instagram, Twitter, Github } from "lucide-react";
+import { Instagram, Github, Globe } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -9,14 +9,29 @@ export const Footer = () => {
             © 2024 Insta Wrapped. All rights reserved.
           </div>
           <div className="flex space-x-6">
-            <a href="#" className="text-white/60 hover:text-white transition-colors">
+            <a 
+              href="https://www.instagram.com/brittytino/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white transition-colors"
+            >
               <Instagram className="w-5 h-5" />
             </a>
-            <a href="#" className="text-white/60 hover:text-white transition-colors">
-              <Twitter className="w-5 h-5" />
-            </a>
-            <a href="#" className="text-white/60 hover:text-white transition-colors">
+            <a 
+              href="https://github.com/brittytino" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white transition-colors"
+            >
               <Github className="w-5 h-5" />
+            </a>
+            <a 
+              href="https://www.tinobritty.tech/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white transition-colors"
+            >
+              <Globe className="w-5 h-5" />
             </a>
           </div>
         </div>

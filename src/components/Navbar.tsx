@@ -1,10 +1,12 @@
 import { ArrowLeft, Instagram, PartyPopper } from "lucide-react";
 import { Button } from "./ui/button";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const showBackButton = location.pathname !== "/";
 
   return (
     <motion.nav 
@@ -16,16 +18,25 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => navigate(-1)}
-              className="text-white/80 hover:text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
+            {showBackButton && (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => navigate("/")}
+                className="text-white/80 hover:text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            )}
             <div className="flex items-center space-x-2">
-              <Instagram className="w-6 h-6 text-pink-500 animate-pulse" />
+              <a 
+                href="https://www.instagram.com/brittytino/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Instagram className="w-6 h-6 text-pink-500 animate-pulse" />
+              </a>
               <span className="text-xl font-bold bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange bg-clip-text text-transparent">
                 Insta Wrapped
               </span>
