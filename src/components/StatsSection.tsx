@@ -3,9 +3,11 @@ import { StatsCard } from "@/components/StatsCard";
 import { InstagramProfile } from "@/components/InstagramProfile";
 import { GradientButton } from "@/components/GradientButton";
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnalyticsToggle } from "./AnalyticsToggle";
 import { AnalyticsView } from "./AnalyticsView";
+import { NewYearPopup } from "./NewYearPopup";
+import { Footer } from "./Footer";
 
 interface StatsSectionProps {
   username: string;
@@ -16,6 +18,16 @@ interface StatsSectionProps {
 
 export const StatsSection = ({ username, stats, profileData, handleShare }: StatsSectionProps) => {
   const [activeView, setActiveView] = useState<"insights" | "analytics">("insights");
+  const [showNewYearPopup, setShowNewYearPopup] = useState(false);
+
+  useEffect(() => {
+    // Show the popup after a short delay
+    const timer = setTimeout(() => {
+      setShowNewYearPopup(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <motion.div
@@ -85,6 +97,10 @@ export const StatsSection = ({ username, stats, profileData, handleShare }: Stat
           />
         </Card>
       </motion.div>
+
+      <NewYearPopup open={showNewYearPopup} onOpenChange={setShowNewYearPopup} />
+      
+      <Footer />
     </motion.div>
   );
 };
